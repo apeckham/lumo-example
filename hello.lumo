@@ -7,20 +7,6 @@
          'execa
          'bluebird)
 
-(def argv
-  (-> (.. yargs
-          (scriptName "hello")
-          (demandCommand 2)
-          (default "x" 10)
-          (number "y")
-          (number "x")
-          (command "watch" "tails /var/log/system.log")
-          (demandOption "y")
-          -argv)
-      (js->clj :keywordize-keys true)))
-
-(pprint argv)
-
 (defmulti -main (comp second :_))
 
 (defmethod -main "sleep"
@@ -46,4 +32,16 @@
   (println
     (goog.string.format "%s x %s is %s" (red x) (green y) (yellow (* x y)))))
 
-(-main argv)
+(-> (.. yargs
+        (scriptName "hello")
+        (demandCommand 2)
+        (default "x" 10)
+        (number "y")
+        (number "x")
+        (command "watch" "tails /var/log/system.log")
+        (command "sleep" "demonstrates bluebird")
+        (command "date" "prints current date")
+        (demandOption "y")
+        -argv)
+    (js->clj :keywordize-keys true)
+    -main)
