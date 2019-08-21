@@ -1,6 +1,6 @@
 #!/usr/bin/env lumo
 
-(require 'yargs '[goog.string.format])
+(require 'yargs '[goog.string.format] '[chalk :refer [red green yellow]])
 
 (def argv
   (-> yargs
@@ -16,4 +16,5 @@
 (prn argv)
 
 (let [{:keys [x y]} argv]
-  (println (goog.string.format "%d x %d is %d" x y (* x y))))
+  (println
+    (goog.string.format "%s x %s is %s" (red x) (green y) (yellow (* x y)))))
