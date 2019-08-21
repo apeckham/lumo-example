@@ -1,20 +1,31 @@
 #!/usr/bin/env lumo
 
-(require 'yargs '[goog.string.format] '[chalk :refer [red green yellow]])
+(require 'yargs
+         '[goog.string.format]
+         '[clojure.pprint :refer [pprint]]
+         '[chalk :refer [red green yellow blue]]
+         'execa)
 
 (def argv
-  (-> yargs
-      (.scriptName "hello")
-      (.demandCommand 2)
-      (.default "x" 10)
-      (.command "oops")
-      (.command "ouch")
-      (.demandOption "y")
-      .-argv
+  (-> (.. yargs
+          (scriptName "hello")
+          (demandCommand 2)
+          (default "x" 10)
+          (number "y")
+          (number "x")
+          (command "watch" "tails /var/log/system.log")
+          (demandOption "y")
+          -argv)
       (js->clj :keywordize-keys true)))
 
-(prn argv)
+(pprint argv)
 
-(let [{:keys [x y]} argv]
+(let [{x :x, y :y, [_ command] :_} argv]
+  (println "the command is" (blue command))
   (println
-    (goog.string.format "%s x %s is %s" (red x) (green y) (yellow (* x y)))))
+    (goog.string.format "%s x %s is %s" (red x) (green y) (yellow (* x y))))
+  (println "The date is" (blue (.. execa (sync "date") -stdout)))
+  (when (= "watch" command)
+    (.. (execa "tail" #js ["-f" "/var/log/system.log"])
+        -stdout
+        (pipe process.stdout))))
