@@ -1,0 +1,16 @@
+#!/usr/bin/env lumo
+
+(require 'yargs '[goog.string.format])
+
+(def argv
+  (-> yargs
+      (.demandCommand 2)
+      (.default "x" 10)
+      (.demandOption "y")
+      .-argv
+      (js->clj :keywordize-keys true)))
+
+(prn argv)
+
+(let [{:keys [x y]} argv]
+  (println (goog.string.format "%d x %d is %d" x y (* x y))))

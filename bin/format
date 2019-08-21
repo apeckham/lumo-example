@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+set -ex
+
+(head -1 hello.lumo ; tail -n+2 hello.lumo | /usr/local/bin/zprint) | sponge hello.lumo
