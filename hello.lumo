@@ -1,7 +1,7 @@
 #!/usr/bin/env lumo
 
 (require 'yargs
-         '[goog.string.format]
+         'goog.string.format
          '[clojure.pprint :refer [pprint]]
          '[chalk :refer [red green yellow blue]]
          'execa
