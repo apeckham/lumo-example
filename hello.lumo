@@ -4,8 +4,11 @@
 
 (def argv
   (-> yargs
+      (.scriptName "hello")
       (.demandCommand 2)
       (.default "x" 10)
+      (.command "oops")
+      (.command "ouch")
       (.demandOption "y")
       .-argv
       (js->clj :keywordize-keys true)))
