@@ -4,7 +4,8 @@
          '[goog.string.format]
          '[clojure.pprint :refer [pprint]]
          '[chalk :refer [red green yellow blue]]
-         'execa)
+         'execa
+         'bluebird)
 
 (def argv
   (-> (.. yargs
@@ -20,12 +21,29 @@
 
 (pprint argv)
 
-(let [{x :x, y :y, [_ command] :_} argv]
-  (println "the command is" (blue command))
+(defmulti -main (comp second :_))
+
+(defmethod -main "sleep"
+  []
+  (.. bluebird
+      (all #js [(execa "sleep" #js [2]) (execa "sleep" #js [3])])
+      (then (fn [promises]
+              (println "both sleeps finished")
+              (pprint (js->clj promises))))))
+
+(defmethod -main "watch"
+  []
+  (.. (execa "tail" #js ["-f" "/var/log/system.log"])
+      -stdout
+      (pipe process.stdout)))
+
+(defmethod -main "date"
+  []
+  (println "The date is" (blue (.. execa (sync "date") -stdout))))
+
+(defmethod -main :default
+  [{:keys [x y]}]
   (println
-    (goog.string.format "%s x %s is %s" (red x) (green y) (yellow (* x y))))
-  (println "The date is" (blue (.. execa (sync "date") -stdout)))
-  (when (= "watch" command)
-    (.. (execa "tail" #js ["-f" "/var/log/system.log"])
-        -stdout
-        (pipe process.stdout))))
+    (goog.string.format "%s x %s is %s" (red x) (green y) (yellow (* x y)))))
+
+(-main argv)
